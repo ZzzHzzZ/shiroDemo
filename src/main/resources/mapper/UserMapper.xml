@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.shirodemo.dao.UserMapper">
+    <resultMap id="authMap" type="com.example.shirodemo.model.User">
+        <id column="id" property="id"/>
+        <result column="nickname" property="nickname"/>
+        <result column="pswd" property="pswd"/>
+        <collection property="roles" ofType="com.example.shirodemo.model.Role">
+            <id column="rid" property="id"/>
+            <result column="rname" property="name"/>
+            <collection property="permissions" ofType="com.example.shirodemo.model.Permission">
+                <id column="pid" property="id"/>
+                <result column="pname" property="name"/>
+                <result column="url" property="url"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="selectAuthByUserName" resultMap="authMap">
+        select user.id,user.nickname,user.pswd,role.id as rid,role.name as rname,permission.name as pname,permission.url
+        from u_user user
+        left join u_user_role on u_user_role.uid = user.id
+        left join u_role role on role.id = u_user_role.rid
+        left join u_role_permission on u_role_permission.rid = role.id
+        left join u_permission permission on permission.id = u_role_permission.pid
+        where user.nickname=#{userName}
+    </select>
+</mapper>
